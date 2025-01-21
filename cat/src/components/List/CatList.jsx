@@ -1,18 +1,13 @@
 import { useState, useEffect } from "react";
 import getCats from "../../api/apiClient";
 import './CatList.scss';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import CatCard from "../CatCard/CatCard";
+import Loader from "../Loader/Loader";
 
 const CatList = () => {
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-  };
+  const [load, setLoad] = useState(false);
 
   const fetchCats = async () => {
     setLoading(true);
@@ -21,27 +16,28 @@ const CatList = () => {
     setLoading(false);
   };
   const loadCats = async () => {
-    setLoading(true);
+    setLoad(true);
     const data = await getCats();
     setCats((prevCats) => [...prevCats, ...data]);
-    setLoading(false);
+    setLoad(false);
   };
 
   useEffect(() => {
     fetchCats();
   }, []);
+  
 
   return (
     <div className="container_cat-list">
-      {loading && <p>Загрузка...</p>}
+      {loading && <Loader/>}
       <div className="list_cat">
         {cats.map((cat) => (
           <CatCard key={cat.id} cat={cat} />
         ))}
       </div>
-      <button onClick={loadCats} style={{ marginTop: "20px" }} disabled={loading}>
-        {loading ? "Загрузка..." : "Загрузить ещё котиков"}
-      </button>
+      {load ? <Loader/> : <div className="container_button">
+        <button className="load_button" onClick={loadCats} disabled={load}>Загрузить еще котиков</button>
+      </div>} 
     </div>
   );
 };
